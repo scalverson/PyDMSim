@@ -11,7 +11,7 @@ class PyDMWindowSim(QWidget):
 
         self.pv_list = []
         for i in range(0, self.num_widgets):
-            self.pv_list.append(PV(self, 'FAKE:LOC:' + str(i)))
+            self.pv_list.append(PV(self, 'FAKE:LOC0:' + str(i) + ':PVAL'))
 
         self.setupUI()
         self.resize(300, 200)
@@ -41,7 +41,7 @@ class PV(QObject):
 
         self._name = name
         self._egu = choice(['Torr', 'm', 'l/s', 'Volts', 'Amps', 'eV', 'Joules', 'nC', 'degC', 'psi', 'Watts'])
-        self._hopr = uniform(-1000.0, 1000.0)
+        self._hopr = uniform(-4000.0, 5000.0)
         self._lopr = uniform(-5000.0, self.hopr - abs(self.hopr * 0.1))
         self._value = self.lopr + ((self.hopr-self.lopr) / 2)
         self._hihi = self.hopr - abs((self.hopr-self.lopr) * uniform(0.0, 0.2))
