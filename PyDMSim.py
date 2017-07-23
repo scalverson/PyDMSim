@@ -4,39 +4,50 @@ from DMCircularGauge import DMCircularGauge
 
 
 class PyDMWindowSim(QWidget):
+    num_widgets = 25
+
     def __init__(self, parent=None):
         super(PyDMWindowSim, self).__init__(parent)
 
-        self.pv1 = PV(self, 'FirstPV')
-        self.pv2 = PV(self, 'SecondPV')
-        self.pv3 = PV(self, 'ThirdPV')
-        self.pv4 = PV(self, 'ForthPV')
+        self.pv_list = []
+        for i in range(0, self.num_widgets):
+            self.pv_list.append(PV(self, 'FAKE:LOC:' + str(i)))
 
         self.setupUI()
+        self.resize(300, 200)
 
     def setupUI(self):
+        from math import sqrt, ceil
         layout = QGridLayout(self)
-        layout.addWidget(DMCircularGauge(self.pv1, None, None, self), 0, 0)
-        layout.addWidget(DMCircularGauge(self.pv1, None, None, self), 0, 1)
-        layout.addWidget(DMCircularGauge(self.pv3, None, None, self), 1, 0)
-        layout.addWidget(DMCircularGauge(self.pv4, None, None, self), 1, 1)
+
+        cols = int(ceil(sqrt(len(self.pv_list)))) - 1
+        i = 0
+        j = 0
+        for pv in self.pv_list:
+            layout.addWidget(DMCircularGauge(pv, None, None, self), i, j)
+            if j < cols:
+                j += 1
+            else:
+                j = 0
+                i += 1
 
 
 class PV(QObject):
     invalid = False
 
     def __init__(self, parent=None, name='MyFakePV'):
+        from random import choice, uniform
         super(PV, self).__init__(parent)
 
         self._name = name
-        self._egu = 'Torr'
-        self._value = 50.0
-        self._hopr = 100.0
-        self._lopr = 0.0
-        self._hihi = 75.0
-        self._high = 60.0
-        self._low = 40.0
-        self._lolo = 25.0
+        self._egu = choice(['Torr', 'm', 'l/s', 'Volts', 'Amps', 'eV', 'Joules', 'nC', 'degC', 'psi', 'Watts'])
+        self._hopr = uniform(-1000.0, 1000.0)
+        self._lopr = uniform(-5000.0, self.hopr - abs(self.hopr * 0.1))
+        self._value = self.lopr + ((self.hopr-self.lopr) / 2)
+        self._hihi = self.hopr - abs((self.hopr-self.lopr) * uniform(0.0, 0.2))
+        self._high = self.hopr - abs((self.hopr-self.lopr) * uniform(0.2, 0.4))
+        self._low = self.lopr + abs((self.hopr-self.lopr) * uniform(0.2, 0.4))
+        self._lolo = self.lopr + abs((self.hopr-self.lopr) * uniform(0.0, 0.2))
 
         self.timer = QTimer(self)
         self.connect(self.timer, SIGNAL("timeout()"), self.update_value)
