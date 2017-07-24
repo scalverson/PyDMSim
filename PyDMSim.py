@@ -4,7 +4,7 @@ from DMCircularGauge import DMCircularGauge
 
 
 class PyDMWindowSim(QWidget):
-    num_widgets = 25
+    num_widgets = 4
 
     def __init__(self, parent=None):
         super(PyDMWindowSim, self).__init__(parent)
@@ -41,8 +41,8 @@ class PV(QObject):
 
         self._name = name
         self._egu = choice(['Torr', 'm', 'l/s', 'Volts', 'Amps', 'eV', 'Joules', 'nC', 'degC', 'psi', 'Watts'])
-        self._hopr = uniform(-4000.0, 5000.0)
-        self._lopr = uniform(-5000.0, self.hopr - abs(self.hopr * 0.1))
+        self._hopr = uniform(-40000.0, 50000.0)
+        self._lopr = uniform(-50000.0, self.hopr - abs(self.hopr * 0.1))
         self._value = self.lopr + ((self.hopr-self.lopr) / 2)
         self._hihi = self.hopr - abs((self.hopr-self.lopr) * uniform(0.0, 0.2))
         self._high = self.hopr - abs((self.hopr-self.lopr) * uniform(0.2, 0.4))
